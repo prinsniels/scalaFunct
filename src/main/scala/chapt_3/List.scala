@@ -106,6 +106,41 @@ object List {
    */
   def reverseL[A](l: List[A]): List[A] =
     foldLeft(l, List[A]())((a, b) => Cons(b, a))
+
+
+  /**
+    * Via reverse is a common trick
+    */
+  def foldRightViaFoldLeft[A,B](l: List[A], z: B)(f: (A,B) => B): B =
+    foldLeft(reverseL(l), z)((b,a) => f(a,b))
+
+  /**
+    * the z of foldleft is a function which takes a b and returns a b
+    * the result is given as start of the next iteration, effectively creating a reverse
+    */
+  def foldRightViaFoldLeft_1[A,B](l: List[A], z: B)(f: (A,B) => B): B =
+    foldLeft(l, (b:B) => b)((g,a) => b => g(f(a,b)))(z)
+
+  def foldLeftViaFoldRight[A,B](l: List[A], z: B)(f: (B,A) => B): B =
+    foldRight(l, (b:B) => b)((a,g) => b => g(f(b,a)))(z)
+
+
+  def appendR[A](a: List[A], b: List[A]): List[A] =
+    foldRight(a, b)(Cons(_,_))
+
+
+  // 3.16
+  def addOne(l: List[Int]): List[Int] =
+    foldRight(l, Nil:List[Int])((h,t) => Cons(h+1,t))
+
+  // 3.17
+  def doubleToString(l: List[Double]): List[String] =
+    foldRight(l, Nil:List[String])((h,t) => Cons(h.toString(),t))
+
+  // 3.18
+//  def map[A,B](as: List[A])(f: A => B): List[B] =
+//    foldLeft(as, List[B])
+
 }
 
 
@@ -113,11 +148,10 @@ object tests {
 
   def main(args: Array[String]): Unit = {
     val work: List[Int] = List(1, 2, 3)
-    println(List.tail(work))
+    val test: List[Int] = List(4,5,6)
 
-    println(List.dropWhile(work, (x: Int) => x < 4))
-
-    println(List.foldRight(List(1, 2, 3), Nil: List[Int])(Cons(_, _)))
-
+    println(List.appendR(work, test))
+    println(List.foldRight(List(1,2,3),0)(_-_))
+    println(List.foldLeft(List(1,2,3),0)(_-_))
   }
 }
